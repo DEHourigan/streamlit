@@ -1,0 +1,8 @@
+[databases.bagel]
+name = "BAGEL peptide database"
+description = "Reference bacteriocin peptide sequences from BAGEL."
+fasta = "data/databases/bagel/bagel_db.faa"
+blast_db = "data/databases/bagel/bagel_db"
+enabled = true
+version = "Local BAGEL export"
+citation = "van Heel et al. BAGEL4: a user-friendly web server to thoroughly mine RiPPs and bacteriocins."
