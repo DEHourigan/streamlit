@@ -3,6 +3,8 @@ streamlit
 
 A short description of your project
 
+https://app-bagel4-blast.streamlit.app
+
 Project Organization
 --------------------
 
