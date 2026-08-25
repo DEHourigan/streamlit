@@ -29,9 +29,12 @@ an app with `src/app.py` as the main file. The deployment service will install:
 - Python packages such as Biopython from `requirements.txt`.
 - The NCBI BLAST+ system package from `packages.txt`.
 
-Select Python 3.10 for the deployment. This matches amPEPpy's supported versions,
-and `requirements.txt` pins scikit-learn 1.4.0 to the version used to serialize the
-bundled pretrained model.
+Select Python 3.12 for the deployment. This has a compatible prebuilt scikit-learn
+wheel, and `requirements.txt` pins scikit-learn 1.4.0 to the version used to serialize the
+bundled pretrained model. Python cannot be changed on an existing Streamlit Community
+Cloud deployment: delete and redeploy the app if it was created with another version.
+The NumPy and scikit-learn requirements are guarded for Python 3.10–3.12 so an accidental
+newer deployment fails fast instead of attempting a slow incompatible source build.
 
 The bundled BAGEL FASTA and BLAST index files are read directly from the repository,
 so this database does not need a separate server. Check that Git/GitHub contains all

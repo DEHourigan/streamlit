@@ -6,6 +6,7 @@ Streamlit deployment.
 """
 from pathlib import Path
 import pickle
+import sys
 
 from .base import BasePredictor, PredictionResult, PredictorUnavailable
 
@@ -55,6 +56,11 @@ class AmPEPpyPredictor(BasePredictor):
         self._model = None
 
     def availability(self) -> tuple[bool, str]:
+        if not ((3, 10) <= sys.version_info[:2] < (3, 13)):
+            return False, (
+                f"The bundled model requires Python 3.10–3.12; this deployment uses "
+                f"Python {sys.version_info.major}.{sys.version_info.minor}."
+            )
         if not DEFAULT_MODEL.is_file():
             return False, f"Bundled model is missing: {DEFAULT_MODEL}"
         try:
