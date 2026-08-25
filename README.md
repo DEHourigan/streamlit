@@ -29,6 +29,10 @@ an app with `src/app.py` as the main file. The deployment service will install:
 - Python packages such as Biopython from `requirements.txt`.
 - The NCBI BLAST+ system package from `packages.txt`.
 
+Select Python 3.10 for the deployment. This matches amPEPpy's supported versions,
+and `requirements.txt` pins scikit-learn 1.4.0 to the version used to serialize the
+bundled pretrained model.
+
 The bundled BAGEL FASTA and BLAST index files are read directly from the repository,
 so this database does not need a separate server. Check that Git/GitHub contains all
 of the moved files before deployment:
@@ -38,17 +42,11 @@ git status
 git add requirements.txt packages.txt config/databases.toml data/databases src
 ```
 
-Do not commit optional predictor environments or large model dependencies merely to
-make the core app deploy. Macrel and amPEPpy remain optional and report their absence
-without disabling BLAST, browsing, or sequence analysis.
-
-Macrel and amPEPpy are optional. Their dependencies are isolated from the core UI;
-missing predictors are reported without breaking the other tools. See
-`requirements-amp.txt` for the optional installation boundary.
-
-Macrel's maintained installation route is Bioconda (`conda install -c bioconda
-macrel`). amPEPpy can be installed from its source repository and also needs its
-pretrained model file (see below).
+Macrel and amPEPpy are installed from pinned upstream revisions in
+`requirements.txt`. The official amPEPpy pretrained model is stored at
+`data/models/ampeppy/amPEP.model`. Commit that model file as well as the requirements
+so visitors can use both classifiers. Predictor execution is isolated from the UI,
+so a model-specific runtime error does not disable the other tools.
 
 ## Add a database
 

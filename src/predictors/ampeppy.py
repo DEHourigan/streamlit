@@ -24,7 +24,12 @@ class AmPEPpyPredictor(BasePredictor):
         with tempfile.TemporaryDirectory(prefix="ampeppy-") as directory:
             fasta, output = Path(directory) / "input.fasta", Path(directory) / "prediction.tsv"
             fasta.write_text(f">query\n{sequence}\n", encoding="utf-8")
-            completed = subprocess.run([detail, "predict", "-m", str(DEFAULT_MODEL), "-i", str(fasta), "-o", str(output), "--seed", "2012"], capture_output=True, text=True, check=False, timeout=300)
+            completed = subprocess.run(
+                [detail, "predict", "-m", str(DEFAULT_MODEL), "-i", str(fasta),
+                 "-o", str(output), "--seed", "2012", "-t", "1"],
+                capture_output=True, text=True, check=False, timeout=300,
+                cwd=directory,
+            )
             if completed.returncode or not output.is_file():
                 raise PredictorUnavailable(completed.stderr.strip() or "amPEPpy did not produce a prediction file.")
             with output.open(encoding="utf-8") as handle:
@@ -32,7 +37,8 @@ class AmPEPpyPredictor(BasePredictor):
         if not rows:
             raise PredictorUnavailable("amPEPpy returned an empty prediction file.")
         row = rows[0]
-        probability = next((float(value) for key, value in row.items() if "prob" in key.lower() and value), None)
-        label = next((value for key, value in row.items() if key.lower() in {"prediction", "class", "label"}), None)
+        probability_value = row.get("probability_AMP")
+        probability = float(probability_value) if probability_value else None
+        label = row.get("predicted")
         prediction = "AMP" if (label and "amp" in label.lower() and "non" not in label.lower()) or (not label and probability is not None and probability >= 0.5) else "Non-AMP"
         return PredictionResult(self.name, prediction, probability, {"raw": row})

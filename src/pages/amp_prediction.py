@@ -12,7 +12,7 @@ def predictor_registry():
     return [MacrelPredictor(), AmPEPpyPredictor()]
 
 st.title("🧪 AMP prediction")
-st.write("Optional predictors are isolated behind a common interface; unavailable model dependencies do not prevent the rest of the platform from running.")
+st.write("Compare the bundled Macrel and amPEPpy pretrained AMP classifiers. Predictor execution remains isolated behind a common interface.")
 predictors = predictor_registry()
 for predictor in predictors:
     available, detail = predictor.availability()
