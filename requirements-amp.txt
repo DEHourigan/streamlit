@@ -1,5 +1,0 @@
-# Install these separately because model stacks can have stricter platform constraints.
--r requirements.txt
-# Install Macrel with Bioconda: conda install -c bioconda macrel
-# Install amPEPpy from https://github.com/tlawrence3/amPEPpy and copy its
-# pretrained model to data/models/ampeppy/amPEP.model.

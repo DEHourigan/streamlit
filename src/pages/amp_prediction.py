@@ -5,14 +5,13 @@ import streamlit as st
 from core.sequence import clean_sequence
 from predictors.ampeppy import AmPEPpyPredictor
 from predictors.base import PredictorUnavailable
-from predictors.macrel import MacrelPredictor
 
 @st.cache_resource
 def predictor_registry():
-    return [MacrelPredictor(), AmPEPpyPredictor()]
+    return [AmPEPpyPredictor()]
 
 st.title("🧪 AMP prediction")
-st.write("Compare the bundled Macrel and amPEPpy pretrained AMP classifiers. Predictor execution remains isolated behind a common interface.")
+st.write("Predict antimicrobial peptide activity with the bundled amPEPpy pretrained classifier.")
 predictors = predictor_registry()
 available_predictors = []
 unavailable_details = []

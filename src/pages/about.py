@@ -5,7 +5,6 @@ import subprocess
 import streamlit as st
 from core.databases import load_databases
 from predictors.ampeppy import AmPEPpyPredictor
-from predictors.macrel import MacrelPredictor
 
 st.title("ℹ️ About")
 st.write("This platform combines local peptide databases, NCBI BLAST+, Biopython ProtParam, and optional pretrained AMP classifiers.")
@@ -23,13 +22,12 @@ try:
 except importlib.metadata.PackageNotFoundError:
     biopython_version = "Not installed"
 st.write(f"NCBI BLAST+: {blast_version}  \nBiopython: {biopython_version}")
-for predictor in [MacrelPredictor(), AmPEPpyPredictor()]:
+for predictor in [AmPEPpyPredictor()]:
     available, detail = predictor.availability()
     st.write(f"{predictor.name}: {detail if not available else 'available'}")
 st.markdown("""
 **Predictor citations**
 
-- Santos-Júnior et al. (2020), *Macrel: antimicrobial peptide screening in genomes and metagenomes*, PeerJ 8:e10555.
 - Lawrence et al. (2021), *amPEPpy 1.0: a portable and accurate antimicrobial peptide prediction tool*, Bioinformatics 37:2058–2060.
 """)
 st.subheader("Methodology")
