@@ -14,9 +14,24 @@ def predictor_registry():
 st.title("🧪 AMP prediction")
 st.write("Compare the bundled Macrel and amPEPpy pretrained AMP classifiers. Predictor execution remains isolated behind a common interface.")
 predictors = predictor_registry()
+available_predictors = []
+unavailable_details = []
 for predictor in predictors:
     available, detail = predictor.availability()
-    (st.success if available else st.info)(f"{predictor.name}: {'available' if available else detail}")
+    if available:
+        available_predictors.append(predictor)
+    else:
+        unavailable_details.append(f"{predictor.name}: {detail}")
+
+if available_predictors:
+    st.success("Available models: " + ", ".join(predictor.name for predictor in available_predictors))
+else:
+    st.error("No AMP predictors are installed in this deployment.")
+    with st.expander("Deployment diagnostics"):
+        for detail in unavailable_details:
+            st.write(detail)
+    st.stop()
+
 sequence = st.text_area("Amino-acid sequence", value=st.session_state.pop("prediction_sequence", ""), height=160)
 if st.button("Predict", type="primary"):
     try:
@@ -24,7 +39,7 @@ if st.button("Predict", type="primary"):
     except ValueError as exc:
         st.error(str(exc)); st.stop()
     results, errors = [], []
-    for predictor in predictors:
+    for predictor in available_predictors:
         try:
             results.append(predictor.predict(sequence))
         except (PredictorUnavailable, subprocess.SubprocessError) as exc:
