@@ -42,9 +42,10 @@ git status
 git add requirements.txt packages.txt config/databases.toml data/databases src
 ```
 
-amPEPpy is installed from a pinned upstream revision in `requirements.txt`. The
-official pretrained model is stored at `data/models/ampeppy/amPEP.model`. Commit that
-model file as well as the requirements so visitors can use the classifier. Predictor
+The official amPEPpy pretrained model is stored at
+`data/models/ampeppy/amPEP.model`. A lightweight local adapter calculates its CTD
+features and runs that model directly, avoiding a legacy Git package build during
+deployment. Commit the model file so visitors can use the classifier. Predictor
 execution is isolated from the UI, so a model-specific runtime error does not disable
 the other tools.
 
@@ -78,7 +79,7 @@ Implement `BasePredictor` from `src/predictors/base.py`, including `availability
 and `predict(sequence)`, then register the wrapper in `pages/amp_prediction.py`.
 Model imports and command execution belong in the wrapper, not in the page.
 
-The hosted app uses amPEPpy through its `ampep` command and expects the pretrained
-model at `data/models/ampeppy/amPEP.model`. A dormant Macrel wrapper remains available
+The hosted app runs the bundled amPEPpy model directly through the adapter in
+`src/predictors/ampeppy.py`. A dormant Macrel wrapper remains available
 for installations with a separately managed Macrel environment, but it is not part
 of the lightweight Streamlit Cloud deployment.

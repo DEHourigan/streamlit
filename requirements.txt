@@ -1,7 +1,6 @@
 streamlit>=1.36
 pandas>=2.0
 biopython>=1.81
+numpy>=1.23.5,<2.0
 scikit-learn==1.4.0
 tomli>=2.0; python_version < "3.11"
-# Predictor sources are pinned so Streamlit Cloud builds are reproducible.
-amPEPpy @ git+https://github.com/tlawrence3/amPEPpy.git@85aab3428b328d9fe4744052258746d8f4ba7bf6
