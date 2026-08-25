@@ -1,6 +1,6 @@
 streamlit>=1.36
 pandas>=2.0
 biopython>=1.81
-numpy>=1.23.5,<2.0; python_version < "3.13"
-scikit-learn==1.4.0; python_version < "3.13"
+numpy>=1.26
+onnxruntime==1.29.0
 tomli>=2.0; python_version < "3.11"

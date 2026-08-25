@@ -29,12 +29,9 @@ an app with `src/app.py` as the main file. The deployment service will install:
 - Python packages such as Biopython from `requirements.txt`.
 - The NCBI BLAST+ system package from `packages.txt`.
 
-Select Python 3.12 for the deployment. This has a compatible prebuilt scikit-learn
-wheel, and `requirements.txt` pins scikit-learn 1.4.0 to the version used to serialize the
-bundled pretrained model. Python cannot be changed on an existing Streamlit Community
-Cloud deployment: delete and redeploy the app if it was created with another version.
-The NumPy and scikit-learn requirements are guarded for Python 3.10–3.12 so an accidental
-newer deployment fails fast instead of attempting a slow incompatible source build.
+The amPEPpy random forest is stored in portable ONNX form, so the app can run on
+Streamlit Community Cloud's Python 3.14 runtime without loading a version-specific
+scikit-learn pickle.
 
 The bundled BAGEL FASTA and BLAST index files are read directly from the repository,
 so this database does not need a separate server. Check that Git/GitHub contains all
@@ -46,8 +43,8 @@ git add requirements.txt packages.txt config/databases.toml data/databases src
 ```
 
 The official amPEPpy pretrained model is stored at
-`data/models/ampeppy/amPEP.model`. A lightweight local adapter calculates its CTD
-features and runs that model directly, avoiding a legacy Git package build during
+`data/models/ampeppy/amPEP.onnx`. A lightweight local adapter calculates its CTD
+features and runs that model with ONNX Runtime, avoiding a legacy Git package build during
 deployment. Commit the model file so visitors can use the classifier. Predictor
 execution is isolated from the UI, so a model-specific runtime error does not disable
 the other tools.

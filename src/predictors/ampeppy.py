@@ -5,12 +5,10 @@ official random-forest model directly, avoiding a legacy Git package build durin
 Streamlit deployment.
 """
 from pathlib import Path
-import pickle
-import sys
 
 from .base import BasePredictor, PredictionResult, PredictorUnavailable
 
-DEFAULT_MODEL = Path(__file__).resolve().parents[2] / "data" / "models" / "ampeppy" / "amPEP.model"
+DEFAULT_MODEL = Path(__file__).resolve().parents[2] / "data" / "models" / "ampeppy" / "amPEP.onnx"
 CTD_GROUPS = {
     "hydrophobicity": ("RKEDQN", "GASTPHY", "CLVIMFW"),
     "normalized.van.der.waals": ("GASTPDC", "NVEQIL", "MHKFRYW"),
@@ -53,31 +51,28 @@ class AmPEPpyPredictor(BasePredictor):
     name = "amPEPpy"
 
     def __init__(self) -> None:
-        self._model = None
+        self._session = None
 
     def availability(self) -> tuple[bool, str]:
-        if not ((3, 10) <= sys.version_info[:2] < (3, 13)):
-            return False, (
-                f"The bundled model requires Python 3.10–3.12; this deployment uses "
-                f"Python {sys.version_info.major}.{sys.version_info.minor}."
-            )
         if not DEFAULT_MODEL.is_file():
             return False, f"Bundled model is missing: {DEFAULT_MODEL}"
         try:
             import numpy  # noqa: F401
-            import sklearn  # noqa: F401
+            import onnxruntime  # noqa: F401
         except ImportError:
-            return False, "Install NumPy and scikit-learn from requirements.txt."
+            return False, "Install NumPy and ONNX Runtime from requirements.txt."
         return True, str(DEFAULT_MODEL)
 
-    def _load_model(self):
-        if self._model is None:
+    def _load_session(self):
+        if self._session is None:
             try:
-                with DEFAULT_MODEL.open("rb") as handle:
-                    self._model = pickle.load(handle)
+                import onnxruntime as ort
+                self._session = ort.InferenceSession(
+                    str(DEFAULT_MODEL), providers=["CPUExecutionProvider"]
+                )
             except Exception as exc:
                 raise PredictorUnavailable(f"Could not load the bundled amPEPpy model: {exc}") from exc
-        return self._model
+        return self._session
 
     def predict(self, sequence: str) -> PredictionResult:
         available, detail = self.availability()
@@ -86,9 +81,10 @@ class AmPEPpyPredictor(BasePredictor):
         import numpy as np
 
         feature_values = list(calculate_ctd_features(sequence).values())
-        frame = np.asarray([feature_values], dtype=float)
+        frame = np.asarray([feature_values], dtype=np.float32)
         try:
-            probabilities = self._load_model().predict_proba(frame)[0]
+            outputs = self._load_session().run(None, {"features": frame})
+            probabilities = outputs[1][0]
         except Exception as exc:
             raise PredictorUnavailable(f"amPEPpy inference failed: {exc}") from exc
         non_amp_probability, amp_probability = map(float, probabilities)
